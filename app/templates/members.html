@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pagination %}
+{% block title %}会员管理{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h2>会员管理</h2>
+  <a class="btn btn-primary" href="{{ url_for('members.create') }}">+ 办理会员</a>
+</div>
+
+<form class="filter-bar" method="get">
+  <input type="text" name="q" value="{{ q or '' }}" placeholder="会员编号 / 姓名 / 手机号">
+  <button type="submit" class="btn">搜索</button>
+</form>
+
+<table class="table">
+  <thead><tr><th>编号</th><th>姓名</th><th>手机号</th><th>积分</th><th>入会日期</th><th class="text-right">操作</th></tr></thead>
+  <tbody>
+    {% for m in page.items %}
+    <tr>
+      <td>{{ m.member_id }}</td>
+      <td>{{ m.member_name }}</td>
+      <td>{{ m.phone }}</td>
+      <td>{{ m.points }}</td>
+      <td>{{ m.join_date | date }}</td>
+      <td class="text-right"><a class="btn btn-sm" href="{{ url_for('members.edit', member_id=m.member_id) }}">编辑</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="empty">暂无会员</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% set total_pages = ((page.total + page.page_size - 1) // page.page_size) if page.total else 1 %}
+{{ pagination(page, total_pages) }}
+{% endblock %}

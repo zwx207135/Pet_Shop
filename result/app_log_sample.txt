@@ -1,0 +1,25 @@
+# PetCare 后端日志样例（logs/app.log，节选真实运行记录）
+# 行格式：<时间> <级别> <logger> <message>
+#
+# 访问结果行 message 字段：  request_id / method / path / endpoint / role / status
+# 错误行     message 字段：  request_id / operation / role / code / message / detail
+# role 取值：店员 / 店长 / -（未登录）
+#
+# ---- 业务错误：参数非法（表单数量非整数）----
+2026-11-08 17:14:04,832 ERROR petcare.web error request_id=e9b2261982c3 operation=orders.create role=店员 code=VALIDATION_ERROR message='购买数量必须是整数' detail=None
+2026-11-08 17:14:04,833 INFO  petcare.web request_id=e9b2261982c3 method=POST path=/orders/new endpoint=orders.create role=店员 status=400
+#
+# ---- 业务错误：库存不足（整单回滚）----
+2026-11-08 17:14:05,970 ERROR petcare.web error request_id=b050bb4747db operation=orders.create role=店员 code=BUSINESS_RULE_VIOLATION message='库存不足' detail=None
+2026-11-08 17:14:05,972 INFO  petcare.web request_id=b050bb4747db method=POST path=/orders/new endpoint=orders.create role=店员 status=400
+#
+# ---- 业务错误：停售商品下单被拒 ----
+2026-11-08 17:14:07,191 ERROR petcare.web error request_id=020441b1375d operation=orders.create role=店员 code=BUSINESS_RULE_VIOLATION message='商品已停售' detail=None
+2026-11-08 17:14:07,193 INFO  petcare.web request_id=020441b1375d method=POST path=/orders/new endpoint=orders.create role=店员 status=400
+#
+# ---- 权限拦截：店员访问店长专属 /employees -> 302 重定向 ----
+2026-11-08 17:14:03,531 INFO  petcare.web request_id=3f646e613f05 method=GET path=/employees endpoint=employees.list role=店员 status=302
+#
+# ---- 登录与正常访问 ----
+2026-11-08 17:14:12,603 INFO  petcare.web request_id=4473737f630f method=POST path=/login endpoint=auth.login role=店长 status=302
+2026-11-08 17:14:15,381 INFO  petcare.web request_id=b3e122eee543 method=GET path=/reports endpoint=reports.index role=店长 status=200

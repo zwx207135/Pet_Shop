@@ -1,74 +1,19 @@
 ============================= test session starts =============================
-platform win32 -- Python 3.14.3, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\张文欣\AppData\Local\Python\pythoncore-3.14-64\python.exe
-cachedir: .pytest_cache
-rootdir: C:\Users\张文欣\Desktop\宠物店数据库\Pet_Shop-main
+platform win32 -- Python 3.13.9, pytest-8.4.2, pluggy-1.5.0
+rootdir: D:\wzh\大三\数据库\数据库实验\Pet_Shop
 configfile: pytest.ini
 testpaths: tests
-plugins: anyio-4.14.2, langsmith-0.10.5
-collecting ... collected 63 items
+plugins: anyio-4.10.0, langsmith-0.10.5
+collected 63 items
 
-tests/test_database.py::test_ping_all_roles PASSED                       [  1%]
-tests/test_database.py::test_nested_transaction_is_rejected PASSED       [  3%]
-tests/test_database.py::test_transaction_rolls_back_on_exception PASSED  [  4%]
-tests/test_database.py::test_transaction_commits_on_success PASSED       [  6%]
-tests/test_employee_dao.py::test_get_credentials PASSED                  [  7%]
-tests/test_employee_dao.py::test_manager_can_list_employees PASSED       [  9%]
-tests/test_employee_dao.py::test_clerk_cannot_read_employees PASSED      [ 11%]
-tests/test_employee_dao.py::test_auth_account_has_only_the_login_view PASSED [ 12%]
-tests/test_inventory_dao.py::test_get_inventory PASSED                   [ 14%]
-tests/test_inventory_dao.py::test_list_and_low_stock_filter PASSED       [ 15%]
-tests/test_inventory_dao.py::test_low_stock_detection PASSED             [ 17%]
-tests/test_inventory_dao.py::test_create_writes_initial_log PASSED       [ 19%]
-tests/test_inventory_dao.py::test_duplicate_inventory_conflicts PASSED   [ 20%]
-tests/test_inventory_dao.py::test_adjust_in_and_out PASSED               [ 22%]
-tests/test_inventory_dao.py::test_adjust_insufficient_stock PASSED       [ 23%]
-tests/test_inventory_dao.py::test_adjust_rejects_zero_and_sign_mismatch PASSED [ 25%]
-tests/test_inventory_dao.py::test_adjust_missing_inventory PASSED        [ 26%]
-tests/test_inventory_dao.py::test_set_warn_requires_product_update PASSED [ 28%]
-tests/test_inventory_dao.py::test_list_logs_filters_and_pagination PASSED [ 30%]
-tests/test_member_dao.py::test_search_and_get PASSED                     [ 31%]
-tests/test_member_dao.py::test_create_member PASSED                      [ 33%]
-tests/test_member_dao.py::test_duplicate_phone_conflicts PASSED          [ 34%]
-tests/test_member_dao.py::test_update_member PASSED                      [ 36%]
-tests/test_member_dao.py::test_add_points PASSED                         [ 38%]
-tests/test_member_dao.py::test_add_points_rejects_negative_balance PASSED [ 39%]
-tests/test_member_dao.py::test_create_rejects_negative_points PASSED     [ 41%]
-tests/test_order_concurrency.py::test_last_unit_cannot_be_sold_twice PASSED [ 42%]
-tests/test_order_dao.py::test_create_order_merges_duplicate_items PASSED [ 44%]
-tests/test_order_dao.py::test_create_order_without_member PASSED         [ 46%]
-tests/test_order_dao.py::test_insufficient_stock_aborts_before_writes PASSED [ 47%]
-tests/test_order_dao.py::test_missing_product PASSED                     [ 49%]
-tests/test_order_dao.py::test_stopped_product_cannot_be_ordered PASSED   [ 50%]
-tests/test_order_dao.py::test_invalid_items PASSED                       [ 52%]
-tests/test_order_dao.py::test_unknown_employee_or_member PASSED          [ 53%]
-tests/test_order_dao.py::test_get_and_list PASSED                        [ 55%]
-tests/test_order_dao.py::test_update_status PASSED                       [ 57%]
-tests/test_order_dao.py::test_list_details PASSED                        [ 58%]
-tests/test_order_dao.py::test_create_requires_transaction PASSED         [ 60%]
-tests/test_permissions.py::test_clerk_allowed_reads PASSED               [ 61%]
-tests/test_permissions.py::test_clerk_can_use_order_sequences PASSED     [ 63%]
-tests/test_permissions.py::test_clerk_cannot_use_product_sequence PASSED [ 65%]
-tests/test_permissions.py::test_clerk_cannot_modify_products PASSED      [ 66%]
-tests/test_permissions.py::test_clerk_cannot_read_employee_table PASSED  [ 68%]
-tests/test_permissions.py::test_manager_can_manage_products PASSED       [ 69%]
-tests/test_permissions.py::test_manager_can_use_product_sequence PASSED  [ 71%]
-tests/test_product_dao.py::test_list_and_pagination PASSED               [ 73%]
-tests/test_product_dao.py::test_list_filters PASSED                      [ 74%]
-tests/test_product_dao.py::test_list_invalid_pagination PASSED           [ 76%]
-tests/test_product_dao.py::test_keyword_is_parameterized PASSED          [ 77%]
-tests/test_product_dao.py::test_get_existing_and_missing PASSED          [ 79%]
-tests/test_product_dao.py::test_create_product PASSED                    [ 80%]
-tests/test_product_dao.py::test_create_rejects_invalid_price PASSED      [ 82%]
-tests/test_product_dao.py::test_update_and_unknown_field PASSED          [ 84%]
-tests/test_product_dao.py::test_set_status PASSED                        [ 85%]
-tests/test_product_dao.py::test_delete_referenced_product_conflicts PASSED [ 87%]
-tests/test_product_dao.py::test_delete_unreferenced_product PASSED       [ 88%]
-tests/test_product_dao.py::test_list_categories PASSED                   [ 90%]
-tests/test_product_dao.py::test_clerk_cannot_create_product PASSED       [ 92%]
-tests/test_report_dao.py::test_product_sales PASSED                      [ 93%]
-tests/test_report_dao.py::test_product_sales_date_filter PASSED          [ 95%]
-tests/test_report_dao.py::test_inventory_status PASSED                   [ 96%]
-tests/test_report_dao.py::test_member_consumption PASSED                 [ 98%]
-tests/test_report_dao.py::test_invalid_ranges PASSED                     [100%]
+tests\test_database.py ....                                              [  6%]
+tests\test_employee_dao.py ....                                          [ 12%]
+tests\test_inventory_dao.py ...........                                  [ 30%]
+tests\test_member_dao.py .......                                         [ 41%]
+tests\test_order_concurrency.py .                                        [ 42%]
+tests\test_order_dao.py ...........                                      [ 60%]
+tests\test_permissions.py .......                                        [ 71%]
+tests\test_product_dao.py .............                                  [ 92%]
+tests\test_report_dao.py .....                                           [100%]
 
-============================= 63 passed in 3.52s ==============================
+============================= 63 passed in 2.17s ==============================

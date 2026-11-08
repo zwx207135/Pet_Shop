@@ -1,4 +1,4 @@
-﻿已将数据库上下文更改为 "PetCareDB"。
+﻿Changed database context to 'PetCareDB'.
 --- 1. 迁移结构检查 ---
 PASS: structure
 --- 2. 迁移前后数据量保持 ---
@@ -6,12 +6,12 @@ PASS: row counts
 --- 3. 订单金额与计算列 ---
 PASS: order amounts
 --- 4. 统计视图回归 ---
-警告: 聚合或其他 SET 操作消除了 Null 值。
-警告: 聚合或其他 SET 操作消除了 Null 值。
-警告: 聚合或其他 SET 操作消除了 Null 值。
-警告: 聚合或其他 SET 操作消除了 Null 值。
-警告: 聚合或其他 SET 操作消除了 Null 值。
-警告: 聚合或其他 SET 操作消除了 Null 值。
+Warning: Null value is eliminated by an aggregate or other SET operation.
+Warning: Null value is eliminated by an aggregate or other SET operation.
+Warning: Null value is eliminated by an aggregate or other SET operation.
+Warning: Null value is eliminated by an aggregate or other SET operation.
+Warning: Null value is eliminated by an aggregate or other SET operation.
+Warning: Null value is eliminated by an aggregate or other SET operation.
 PASS: reporting views
 --- 5. 登录视图 ---
 PASS: login view

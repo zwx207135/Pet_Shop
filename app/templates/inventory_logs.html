@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pagination %}
+{% block title %}库存流水{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h2>库存流水</h2>
+  <a class="btn" href="{{ url_for('inventory.list') }}">返回库存</a>
+</div>
+
+<form class="filter-bar" method="get">
+  <input type="text" name="product_id" value="{{ product_id or '' }}" placeholder="商品编号">
+  <select name="change_type">
+    <option value="">全部类型</option>
+    {% for t in change_types %}
+      <option value="{{ t }}" {% if change_type == t %}selected{% endif %}>{{ t }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn">筛选</button>
+</form>
+
+<table class="table">
+  <thead><tr><th>流水号</th><th>商品</th><th>类型</th><th>数量变动</th><th>时间</th><th>备注</th></tr></thead>
+  <tbody>
+    {% for log in page.items %}
+    <tr>
+      <td>{{ log.log_id }}</td>
+      <td>{{ log.product_name }}（{{ log.product_id }}）</td>
+      <td>{{ log.change_type }}</td>
+      <td class="{% if log.change_qty < 0 %}text-neg{% else %}text-pos{% endif %}">{{ '%+d' % log.change_qty }}</td>
+      <td>{{ log.change_time | dt }}</td>
+      <td>{{ log.remark or '-' }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" class="empty">暂无流水</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% set total_pages = ((page.total + page.page_size - 1) // page.page_size) if page.total else 1 %}
+{{ pagination(page, total_pages) }}
+{% endblock %}

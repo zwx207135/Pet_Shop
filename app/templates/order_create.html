@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}新订单{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h2>新订单</h2>
+  <a class="btn" href="{{ url_for('orders.list') }}">返回列表</a>
+</div>
+
+<form method="post" id="order-form" class="card">
+  <div class="grid-2">
+    <label>会员
+      <select name="member_id">
+        <option value="">散客（非会员）</option>
+        {% for m in members %}
+          <option value="{{ m.member_id }}" {% if form.get('member_id') == m.member_id %}selected{% endif %}>{{ m.member_name }}（{{ m.phone }}）</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>支付方式
+      <select name="pay_method">
+        {% for pm in pay_methods %}
+          <option value="{{ pm }}" {% if (form.get('pay_method') or '现金') == pm %}selected{% endif %}>{{ pm }}</option>
+        {% endfor %}
+      </select>
+    </label>
+  </div>
+
+  <table class="table" id="items-table">
+    <thead><tr><th>商品</th><th>单价</th><th>数量</th><th></th></tr></thead>
+    <tbody>
+      <tr class="item-row">
+        <td>
+          <select name="product_id" class="product-select">
+            <option value="">请选择商品</option>
+            {% for p in products %}
+              <option value="{{ p.product_id }}" data-price="{{ p.price }}">{{ p.product_name }} — ¥{{ p.price | money }}</option>
+            {% endfor %}
+          </select>
+        </td>
+        <td class="price-cell">-</td>
+        <td><input type="number" name="quantity" min="1" value="1" class="qty-input"></td>
+        <td><button type="button" class="btn btn-sm remove-row">删除</button></td>
+      </tr>
+    </tbody>
+  </table>
+  <button type="button" class="btn" id="add-row">+ 添加商品</button>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">提交订单</button>
+  </div>
+</form>
+
+<script>
+(function () {
+  var tbody = document.querySelector('#items-table tbody');
+  var rowTemplate = tbody.querySelector('.item-row').cloneNode(true);
+
+  function bindRow(row) {
+    var select = row.querySelector('.product-select');
+    var priceCell = row.querySelector('.price-cell');
+    select.addEventListener('change', function () {
+      var opt = select.options[select.selectedIndex];
+      priceCell.textContent = (opt && opt.value) ? '¥' + opt.dataset.price : '-';
+    });
+    row.querySelector('.remove-row').addEventListener('click', function () {
+      if (tbody.querySelectorAll('.item-row').length > 1) {
+        row.remove();
+      } else {
+        select.value = '';
+        priceCell.textContent = '-';
+        row.querySelector('.qty-input').value = '1';
+      }
+    });
+  }
+  bindRow(tbody.querySelector('.item-row'));
+
+  document.querySelector('#add-row').addEventListener('click', function () {
+    var row = rowTemplate.cloneNode(true);
+    row.querySelector('.product-select').value = '';
+    row.querySelector('.price-cell').textContent = '-';
+    row.querySelector('.qty-input').value = '1';
+    bindRow(row);
+    tbody.appendChild(row);
+  });
+
+  document.querySelector('#order-form').addEventListener('submit', function (e) {
+    var rows = tbody.querySelectorAll('.item-row');
+    var hasItem = false;
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      var pid = row.querySelector('.product-select').value;
+      var qty = parseInt(row.querySelector('.qty-input').value, 10);
+      if (pid && (!qty || qty < 1)) {
+        e.preventDefault();
+        row.querySelector('.qty-input').focus();
+        alert('数量必须为大于等于 1 的整数');
+        return;
+      }
+      if (pid) hasItem = true;
+    }
+    if (!hasItem) {
+      e.preventDefault();
+      alert('请至少选择一件商品');
+    }
+  });
+})();
+</script>
+{% endblock %}

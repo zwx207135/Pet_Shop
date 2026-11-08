@@ -168,7 +168,7 @@ DB_MANAGER_USER / DB_MANAGER_PASSWORD
 
 建议：
 
-- `DB_DRIVER` 使用 `ODBC Driver 18 for SQL Server`；
+- `DB_DRIVER` 使用 `ODBC Driver 17 for SQL Server`（或 18，填本机已安装的驱动）；
 - 本地开发可在连接串中加 `TrustServerCertificate=yes`；
 - 密码通过环境变量或 `.env` 注入，`.env` 不提交仓库；
 - A 提供 `.env.example`，B 负责读取。

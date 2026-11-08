@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% from "_macros.html" import pagination %}
+{% block title %}商品管理{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h2>商品管理</h2>
+  {% if current_user.role == '店长' %}
+    <a class="btn btn-primary" href="{{ url_for('products.create') }}">+ 新增商品</a>
+  {% endif %}
+</div>
+
+<form class="filter-bar" method="get">
+  <input type="text" name="q" value="{{ q or '' }}" placeholder="商品编号 / 名称">
+  <select name="category">
+    <option value="">全部类别</option>
+    {% for c in categories %}
+      <option value="{{ c }}" {% if category == c %}selected{% endif %}>{{ c }}</option>
+    {% endfor %}
+  </select>
+  <select name="status">
+    <option value="">全部状态</option>
+    {% for s in statuses %}
+      <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn">筛选</button>
+</form>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>编号</th><th>名称</th><th>类别</th><th>单价</th><th>预警库存</th><th>状态</th>
+      {% if current_user.role == '店长' %}<th class="text-right">操作</th>{% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in page.items %}
+    <tr>
+      <td>{{ p.product_id }}</td>
+      <td>{{ p.product_name }}</td>
+      <td>{{ p.category or '-' }}</td>
+      <td>¥{{ p.price | money }}</td>
+      <td>{{ p.stock_warn }}</td>
+      <td><span class="badge {% if p.status == '在售' %}badge-ok{% else %}badge-muted{% endif %}">{{ p.status }}</span></td>
+      {% if current_user.role == '店长' %}
+      <td class="text-right">
+        <a class="btn btn-sm" href="{{ url_for('products.edit', product_id=p.product_id) }}">编辑</a>
+        <form method="post" action="{{ url_for('products.set_status', product_id=p.product_id) }}" class="inline">
+          <input type="hidden" name="status" value="{% if p.status == '在售' %}停售{% else %}在售{% endif %}">
+          <button type="submit" class="btn btn-sm {% if p.status == '在售' %}btn-warn{% else %}btn-ok{% endif %}">
+            {% if p.status == '在售' %}停售{% else %}恢复在售{% endif %}
+          </button>
+        </form>
+      </td>
+      {% endif %}
+    </tr>
+    {% else %}
+    <tr><td colspan="7" class="empty">暂无商品</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% set total_pages = ((page.total + page.page_size - 1) // page.page_size) if page.total else 1 %}
+{{ pagination(page, total_pages) }}
+{% endblock %}

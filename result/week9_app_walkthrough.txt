@@ -1,0 +1,139 @@
+
+=== [1] 未登录访问受保护页面 -> 重定向到登录页 ===
+  HTTP 302
+  -> redirect: /login?next=/orders
+
+=== [2] 店员登录（clerk / Clerk@123） ===
+  HTTP 302
+  -> redirect: /
+
+=== [3] 店员登录后工作台（低库存预警） ===
+  HTTP 200
+  [flash] 登录成功
+  低库存预警条数: 0
+
+=== [4] 错误密码登录 -> 401 + 友好提示 ===
+  HTTP 401
+  [flash] 用户名或密码错误
+
+=== [5] 不存在的账号登录 -> 401 ===
+  HTTP 401
+  [flash] 用户名或密码错误
+
+=== [6] 店员：商品列表 + 关键字筛选（'猫粮'） ===
+  HTTP 200
+
+=== [7] 店员：商品列表分页 ===
+  HTTP 200
+
+=== [8] 店员：库存查询 + 流水查看 ===
+  HTTP 200
+  HTTP 200
+
+=== [9] 店员：开单（P001×2 + P002×1 + P002×2 -> 重复合并 P001×2, P002×3） ===
+  开单前库存: [{'product_id': 'P001', 'quantity': 12}, {'product_id': 'P002', 'quantity': 38}]
+  HTTP 302
+  -> redirect: /orders/O00000001005
+  订单详情地址: /orders/O00000001005
+
+=== [10] 店员：查看新订单详情（金额/明细/合并） ===
+  HTTP 200
+  [flash] 订单已创建
+  页面总金额: 315.70
+
+=== [11] DB 核对：订单总额 = 明细合计 + 库存扣减 + 销售流水 ===
+  订单头: [{'order_id': 'O00000001005', 'total_amount': Decimal('315.70')}]
+  明细: {'product_id': 'P001', 'quantity': 2, 'unit_price': Decimal('128.00'), 'subtotal': Decimal('256.00')}
+  明细: {'product_id': 'P002', 'quantity': 3, 'unit_price': Decimal('19.90'), 'subtotal': Decimal('59.70')}
+  销售流水: [{'product_id': 'P001', 'change_type': '销售', 'change_qty': -2}, {'product_id': 'P002', 'change_type': '销售', 'change_qty': -3}]
+  开单后库存: [{'product_id': 'P001', 'quantity': 10}, {'product_id': 'P002', 'quantity': 35}]
+
+=== [12] 店员：订单列表 + 订单查询 ===
+  HTTP 200
+
+=== [13] 店员：会员办理 -> 修改资料 -> 积分调整 ===
+  HTTP 302
+  -> redirect: /members
+  新会员编号: M0001004
+  HTTP 302
+  -> redirect: /members
+  HTTP 302
+  -> redirect: /members/M0001004/edit
+  最终积分: 30
+
+=== [14] 权限：店员访问店长专属路由 -> 302 重定向 + 友好提示 ===
+  HTTP 302
+  -> redirect: /
+  HTTP 302
+  -> redirect: /
+  HTTP 302
+  -> redirect: /
+  HTTP 302
+  -> redirect: /
+
+=== [15] 权限：店员提交店长写操作（POST 新建商品）-> 仍被拦截 ===
+  HTTP 302
+  -> redirect: /
+
+=== [16] 店员登出 ===
+
+=== [17] 店长登录（manager / Manager@123） ===
+  HTTP 302
+  -> redirect: /
+
+=== [18] 店长工作台（导航含 员工/报表） ===
+  HTTP 200
+  [flash] 登录成功
+
+=== [19] 店长：新增商品（自动建初始库存） ===
+  HTTP 302
+  -> redirect: /products
+  新商品: [{'product_id': 'P0001003', 'product_name': '联调测试猫砂128242', 'price': Decimal('39.90'), 'status': '在售', 'quantity': 30}]
+
+=== [20] 店长：编辑商品（改价） ===
+  HTTP 302
+  -> redirect: /products
+
+=== [21] 店长：补货入库（+20） ===
+  HTTP 302
+  -> redirect: /inventory
+  补货前 30 -> 补货后 50
+
+=== [22] 店长：停售商品 ===
+  HTTP 302
+  -> redirect: /products
+
+=== [23] 店长：新增低库存商品（预警演示，qty=2 < warn=10） ===
+  HTTP 302
+  -> redirect: /products
+  低库存商品: [{'product_name': '猫罐头', 'quantity': 2, 'stock_warn': 10}]
+
+=== [24] 店长：员工列表 ===
+  HTTP 200
+  [flash] 商品已创建
+  [flash] 商品已更新
+  [flash] 入库成功
+  [flash] 商品已停售
+  [flash] 商品已创建
+
+=== [25] 店长：经营报表（商品销售/库存状态/会员消费） ===
+  HTTP 200
+
+=== [26] 重新以店员登录（用于异常场景验证） ===
+
+=== [27] 库存不足：整单回滚（业务层 + 事务） ===
+  HTTP 400
+  [flash] 库存不足
+  [flash] 登录成功
+  [flash] 已退出登录
+  订单数 7 -> 7（应不变）
+
+=== [28] 停售商品下单被拒 ===
+  HTTP 400
+  [flash] 商品已停售
+
+=== [29] 参数错误（数量非整数）-> 400 ===
+  HTTP 400
+  [flash] 购买数量必须是整数
+
+=== WALKTHROUGH COMPLETE ===

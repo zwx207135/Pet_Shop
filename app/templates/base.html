@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PetCare 宠物店管理系统{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<nav class="navbar">
+  <a class="nav-brand" href="{{ url_for('main.index') }}">🐾 PetCare 宠物店</a>
+  <div class="nav-links">
+    {% if current_user %}
+      <a href="{{ url_for('products.list') }}">商品</a>
+      <a href="{{ url_for('inventory.list') }}">库存</a>
+      <a href="{{ url_for('orders.list') }}">订单</a>
+      <a href="{{ url_for('members.list') }}">会员</a>
+      {% if current_user.role == '店长' %}
+        <a href="{{ url_for('employees.list') }}">员工</a>
+        <a href="{{ url_for('reports.index') }}">报表</a>
+      {% endif %}
+    {% endif %}
+  </div>
+  <div class="nav-user">
+    {% if current_user %}
+      <span class="nav-name">{{ current_user.employee_name }} · {{ current_user.role }}</span>
+      <form method="post" action="{{ url_for('auth.logout') }}" class="inline">
+        <button type="submit" class="btn btn-ghost btn-sm">退出</button>
+      </form>
+    {% endif %}
+  </div>
+</nav>
+
+<main class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

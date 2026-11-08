@@ -68,8 +68,19 @@ Pet_Shop-main/
 ├─ sql/                    建库、迁移、权限、回归脚本
 ├─ tests/                  DAO 集成测试
 ├─ scripts/                测试库克隆、SQL 执行、第5周验证、结果采集
+├─ app/                    Flask Web 应用（成员B）
+│  ├─ __init__.py          应用工厂、模板过滤器
+│  ├─ config.py            Flask 配置（会话密钥等）
+│  ├─ extensions.py        Database 单例（连接管理）
+│  ├─ security.py          登录态与角色权限装饰器
+│  ├─ services/            业务层：登录/商品/库存/订单/会员/员工/报表
+│  ├─ routes/              页面层：路由蓝图
+│  ├─ errors/              统一异常处理与后端日志
+│  ├─ templates/           Jinja2 模板
+│  └─ static/              CSS 等静态资源
 ├─ docs/                   第1—6周文档、DAO 契约、ER 图
 ├─ result/                 SQL 执行结果与测试证据
+├─ run.py                  Web 应用启动入口
 ├─ .env.example            环境变量模板
 ├─ pytest.ini              pytest 配置
 └─ README.md
@@ -77,15 +88,16 @@ Pet_Shop-main/
 
 ## 六、环境与依赖
 
-- SQL Server 2022/2025 Express（本项目在 SQL Server 2025 Express 17.0 上验证）；
-- ODBC Driver 18 for SQL Server；
-- Python 3.11+（本项目在 Python 3.14.3 上验证）；
-- Python 包：`pyodbc`、`pytest`、`matplotlib`（仅 ER 图导出）、`werkzeug`（B 的登录密码校验）。
+- SQL Server 2022/2025 Express（数据侧在 2025 Express 17.0、应用侧在 2022 Express 16.0 上验证）；
+- ODBC Driver 17 或 18 for SQL Server（数据侧 Driver 18、应用侧 Driver 17，`scripts/create_test_db.py` 自动探测回退）；
+- Python 3.11+（数据侧在 Python 3.14、应用侧在 Python 3.13 上验证）；
+- Python 包：`pyodbc`、`pytest`、`matplotlib`（仅 ER 图导出）、`werkzeug`（B 的登录密码校验）、`flask`（B 的 Web 框架）。
 
 安装示例：
 
 ```bash
-py -m pip install pyodbc pytest matplotlib werkzeug
+py -m pip install -r requirements.txt
+# 或逐个安装：pyodbc pytest matplotlib werkzeug flask
 ```
 
 Windows 上如 `python` 命令不可用，统一使用 `py` 启动器。
@@ -132,7 +144,7 @@ copy .env.example .env
 `.env` 键：
 
 ```text
-DB_DRIVER=ODBC Driver 18 for SQL Server
+DB_DRIVER=ODBC Driver 17 for SQL Server
 DB_SERVER=localhost
 DB_NAME=PetCareDB
 DB_AUTH_USER=petcare_auth
@@ -206,7 +218,7 @@ py -m pytest
 py -m pytest tests/test_order_dao.py -v
 ```
 
-预期结果：63 项测试全部通过。测试覆盖：
+预期结果：数据侧 63 项测试全部通过。测试覆盖：
 
 - 三种角色的连接与 ping、嵌套事务拒绝、异常回滚、成功提交；
 - 商品、库存、会员、员工、订单、报表 DAO；
@@ -215,6 +227,8 @@ py -m pytest tests/test_order_dao.py -v
 - SQL 注入字符串按普通字面量处理。
 
 测试输出证据：`result/week9_pytest.txt`。
+
+应用侧另有 41 项 DB 无关测试（mock DAO）：`python -m pytest tests/test_app_*.py -q`，覆盖登录鉴权、角色权限、参数校验、错误码→HTTP 映射、统一 JSON 结构与后端日志，证据 `result/week9_app_pytest.txt`。
 
 ## 十一、第5—9周文档
 
@@ -226,10 +240,46 @@ py -m pytest tests/test_order_dao.py -v
 | `docs/w6_规范化与迁移说明.md` | 函数依赖、3NF/BCNF、迁移步骤、前后回归 |
 | `docs/第7-9周_DAO接口约定.md` | v1.0 DAO 契约、错误码、权限、验收用例 |
 | `docs/第二阶段报告_数据侧.md` | 第5—9周 A 侧工作总结与交接说明 |
+| `docs/第二阶段报告_应用侧.md` | 第7—9周 B 侧工作总结（Flask 应用、异常、角色界面） |
 
-## 十二、复现步骤
+## 十二、设计说明摘要（ER 图 · 依赖分析 · 更新异常 · 范式 · 分解）
 
-1. 安装 SQL Server Express、SSMS 和 ODBC Driver 18。
+本节按第二阶段阶段作业要求，把 ER 与规范化结论直接汇总于此；完整推导见 `docs/w5_ER模型与规则清单.md` 与 `docs/w6_规范化与迁移说明.md`。
+
+### 12.1 ER 模型
+
+- 9 个实体：商品、库存、库存流水、会员、员工、订单、订单明细、服务项目、服务预约；9 条联系（经办、下单、包含、被购买、对应、产生、预约、负责、被预约）。
+- 采用 crow's foot 表示法，标注主码、外码、候选码（UNIQUE）、基数与参与约束；图见 `docs/er/petcare_er.svg`（可编辑源 `petcare_er.mmd`，导出脚本 `render_er.py`）。
+- 关键基数：`Employee 1—0..N Orders`；`Member 0..1—0..N Orders`（散客 `member_id` 可空）；`Orders 1—1..N OrderDetail`（“至少一条明细”由 DAO 保证）；`Product 1—0..1 Inventory`。
+
+### 12.2 函数依赖（关键）
+
+- 各关系以 `CHAR` 代理码为主码，自然候选码用 `UNIQUE` 保留（如 `Product(product_name, category)`、`Member.phone`、`Employee.login_name`）。
+- 唯一的结构性函数依赖问题在 `OrderDetail`：v0.1 的 `subtotal` 是普通列，存在 `{quantity, unit_price} → subtotal`，决定因素不是超码、`subtotal` 不是主属性。
+
+### 12.3 更新异常
+
+- **小计更新异常（主要）**：v0.1 改 `quantity`/`unit_price` 不同时改 `subtotal` 会被 `CK_OrderDetail_Subtotal` 拒绝；若约束被绕过，则订单金额、商品销售额、会员消费全部失真。
+- **订单总额漂移**：`Orders.total_amount` 与明细合计语义相同，是跨行聚合冗余（非表内 FD 违反），靠下单事务写入 + `regression.sql` 校验一致。
+- **类别/角色文本重复**：`Product.category`、`Employee.role` 重复属字典缺失，不是 3NF 违反；v1.0 保留，列入 v1.1。
+
+### 12.4 范式判断
+
+| 关系 | 3NF | BCNF | 说明 |
+|---|---|---|---|
+| Product / Inventory / InventoryLog / Member / Employee / Orders / PetService / ServiceAppointment | 是 | 是 | 单属性代理码 + 唯一候选码 |
+| OrderDetail（v0.1） | 否 | 否 | `{quantity, unit_price} → subtotal`，`subtotal` 非主属性 |
+| OrderDetail（v1.0） | 是 | 是 | `subtotal` 改为 PERSISTED 计算列后，非平凡 FD 的决定因素均为超码 |
+
+### 12.5 分解方案
+
+- 本次**不做关系分解**：只把 `OrderDetail.subtotal` 改为 `PERSISTED` 计算列，消除唯一 3NF/BCNF 违反；因未拆分关系，无损连接与依赖保持自然成立。
+- `Orders.total_amount` 保留为受控冗余（报表快照），不拆分、不删除；由事务写入、回归校验。
+- 不把 `Product` 与 `Inventory` 合并、不为 `category`/`role` 建字典表：均无传递依赖，拆分/合并不提升范式，只增加连接或锁竞争。
+
+## 十三、复现步骤
+
+1. 安装 SQL Server Express、SSMS 和 ODBC Driver 17（或 18）。
 2. 按第七节顺序执行 `sql/01`—`sql/08`。
 3. 执行 `sql/migration.sql`，再执行 `sql/09_app_accounts.sql`。
 4. 执行 `sql/regression.sql`，确认输出 `REGRESSION PASS`。
@@ -239,7 +289,7 @@ py -m pytest tests/test_order_dao.py -v
 8. 执行 `py -m pytest`，确认 63 项通过。
 9. 需重新生成 ER 图时执行 `py docs/er/render_er.py`。
 
-## 十三、常见问题
+## 十四、常见问题
 
 | 现象 | 原因 | 处理 |
 | --- | --- | --- |
@@ -250,3 +300,56 @@ py -m pytest tests/test_order_dao.py -v
 | 回滚后数据仍然存在 | 使用了 `with conn.cursor()`，pyodbc 退出时提交 | 使用 `dao.utils.cursor_scope(conn)` |
 | `sqlcmd` 执行计算列脚本异常 | 未开启 QUOTED_IDENTIFIER | 加 `-I` |
 | 测试连接失败 | `.env` 密码与 `09_app_accounts.sql` 不一致 | 核对三个应用账号密码 |
+
+## 十五、Web 应用（成员B，应用侧）
+
+成员B 在成员A 的 DAO 之上构建 Flask 应用，分层为：页面层（`app/routes/`）→ 业务层（`app/services/`）→ DAO（`dao/`，成员A）→ SQL Server。B 不写任何 SQL，只调用 DAO 公开接口。
+
+### 15.1 启动
+
+```bash
+# 1. 安装依赖（含 Flask）
+py -m pip install -r requirements.txt
+
+# 2. 复制并填写 .env（复用成员A 三个受限账号的密码）
+copy .env.example .env
+
+# 3. 启动（项目根目录）
+python run.py
+# 或
+flask --app run run
+```
+
+访问 `http://127.0.0.1:5000`，示例登录账号：
+
+| 登录名 | 密码 | 角色 |
+| --- | --- | --- |
+| `manager` | `Manager@123` | 店长 |
+| `clerk` | `Clerk@123` | 店员 |
+
+### 15.2 角色界面
+
+- 店员：商品/库存查看、开单、订单查询、会员办理与积分调整；
+- 店长：在店员基础上，新增/编辑/停售商品、补货入库、员工管理、经营报表。
+
+同一操作在业务层（`roles_required`）与数据库层（受限账号）各校验一次，形成双重防线。
+
+### 15.3 统一异常与日志
+
+- HTML 页面用 flash 展示友好文案；
+- `Accept: application/json` 的请求返回统一 JSON：
+  `{"ok": false, "code": "...", "message": "...", "data": null, "request_id": "..."}`；
+- 后端日志写入 `logs/app.log`（已 gitignore），记录 `request_id`、时间、操作名称、用户角色、错误码、`detail` 与处理结果。
+
+### 15.4 主要路由
+
+| 路由 | 说明 | 权限 |
+| --- | --- | --- |
+| `/login` `/logout` | 登录 / 登出 | 公开 |
+| `/` | 工作台 + 低库存预警 | 登录 |
+| `/products` `/products/new` `/products/<id>/edit` `/products/<id>/status` | 商品查询/新增/编辑/停售 | 查询全员，写操作店长 |
+| `/inventory` `/inventory/logs` `/inventory/<id>/adjust` | 库存、流水、补货入库 | 补货店长 |
+| `/orders` `/orders/new` `/orders/<id>` `/orders/<id>/status` | 订单查询/开单/详情/改状态 | 登录 |
+| `/members` `/members/new` `/members/<id>/edit` `/members/<id>/points` | 会员管理 | 登录 |
+| `/employees` | 员工列表 | 店长 |
+| `/reports` | 商品销售、库存状态、会员消费 | 店长 |

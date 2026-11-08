@@ -1,0 +1,17 @@
+{% macro pagination(page, total_pages) %}
+  {% if total_pages > 1 %}
+  <nav class="pagination">
+    {% if page.page > 1 %}
+      <a class="page-link" href="{{ url_for(request.endpoint, **dict(request.args, page=page.page - 1)) }}">‹ 上一页</a>
+    {% else %}
+      <span class="page-link disabled">‹ 上一页</span>
+    {% endif %}
+    <span class="page-info">第 {{ page.page }} / {{ total_pages }} 页 · 共 {{ page.total }} 条</span>
+    {% if page.page < total_pages %}
+      <a class="page-link" href="{{ url_for(request.endpoint, **dict(request.args, page=page.page + 1)) }}">下一页 ›</a>
+    {% else %}
+      <span class="page-link disabled">下一页 ›</span>
+    {% endif %}
+  </nav>
+  {% endif %}
+{% endmacro %}

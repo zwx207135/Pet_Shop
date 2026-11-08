@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}员工管理{% endblock %}
+{% block content %}
+<h2>员工管理</h2>
+<table class="table">
+  <thead><tr><th>编号</th><th>姓名</th><th>角色</th><th>手机号</th><th>入职日期</th></tr></thead>
+  <tbody>
+    {% for e in employees %}
+    <tr>
+      <td>{{ e.employee_id }}</td>
+      <td>{{ e.employee_name }}</td>
+      <td>{{ e.role }}</td>
+      <td>{{ e.phone or '-' }}</td>
+      <td>{{ e.hire_date | date }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" class="empty">暂无员工</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

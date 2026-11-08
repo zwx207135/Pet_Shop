@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ '编辑会员' if member else '办理会员' }}{% endblock %}
+{% block content %}
+<h2>{{ '编辑会员' if member else '办理会员' }}</h2>
+<form method="post" class="card">
+  <label>姓名
+    <input type="text" name="member_name" value="{{ form.get('member_name', '') }}" required maxlength="30">
+  </label>
+  <label>手机号
+    <input type="text" name="phone" value="{{ form.get('phone', '') }}" required maxlength="20">
+  </label>
+  <label>积分
+    <input type="number" min="0" name="points" value="{{ form.get('points', 0) }}">
+  </label>
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">保存</button>
+    <a class="btn" href="{{ url_for('members.list') }}">取消</a>
+  </div>
+</form>
+
+{% if member %}
+<div class="card">
+  <h3>积分调整</h3>
+  <form method="post" action="{{ url_for('members.add_points', member_id=member.member_id) }}" class="inline">
+    <input type="number" name="delta" placeholder="正数增加、负数扣减" required style="width:180px">
+    <button type="submit" class="btn btn-sm">调整积分</button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

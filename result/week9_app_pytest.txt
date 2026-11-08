@@ -1,0 +1,51 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-8.4.2, pluggy-1.5.0 -- D:\Anaconda\python.exe
+cachedir: .pytest_cache
+rootdir: D:\wzh\大三\数据库\数据库实验\Pet_Shop
+configfile: pytest.ini
+plugins: anyio-4.10.0, langsmith-0.10.5
+collecting ... collected 41 items
+
+tests/test_app_auth.py::test_login_success_writes_session PASSED         [  2%]
+tests/test_app_auth.py::test_login_wrong_password_raises_unauth PASSED   [  4%]
+tests/test_app_auth.py::test_login_unknown_account_raises_unauth PASSED  [  7%]
+tests/test_app_auth.py::test_login_inactive_account_raises_unauth PASSED [  9%]
+tests/test_app_auth.py::test_login_empty_input_raises_validation PASSED  [ 12%]
+tests/test_app_auth.py::test_logout_clears_session PASSED                [ 14%]
+tests/test_app_errors.py::test_error_code_to_http_status[VALIDATION_ERROR-400] PASSED [ 17%]
+tests/test_app_errors.py::test_error_code_to_http_status[UNAUTHENTICATED-401] PASSED [ 19%]
+tests/test_app_errors.py::test_error_code_to_http_status[FORBIDDEN-403] PASSED [ 21%]
+tests/test_app_errors.py::test_error_code_to_http_status[NOT_FOUND-404] PASSED [ 24%]
+tests/test_app_errors.py::test_error_code_to_http_status[BUSINESS_RULE_VIOLATION-409] PASSED [ 26%]
+tests/test_app_errors.py::test_error_code_to_http_status[CONFLICT_UNIQUE-409] PASSED [ 29%]
+tests/test_app_errors.py::test_error_code_to_http_status[CONFLICT_FOREIGN_KEY-409] PASSED [ 31%]
+tests/test_app_errors.py::test_error_code_to_http_status[CONFLICT_CHECK-409] PASSED [ 34%]
+tests/test_app_errors.py::test_error_code_to_http_status[DB_UNAVAILABLE-503] PASSED [ 36%]
+tests/test_app_errors.py::test_error_code_to_http_status[DB_TIMEOUT-503] PASSED [ 39%]
+tests/test_app_errors.py::test_error_code_to_http_status[TRANSACTION_FAILED-500] PASSED [ 41%]
+tests/test_app_errors.py::test_error_code_to_http_status[INTERNAL_ERROR-500] PASSED [ 43%]
+tests/test_app_errors.py::test_json_response_structure PASSED            [ 46%]
+tests/test_app_errors.py::test_html_error_page_does_not_leak_detail PASSED [ 48%]
+tests/test_app_errors.py::test_json_error_does_not_leak_detail PASSED    [ 51%]
+tests/test_app_errors.py::test_backend_log_structure PASSED              [ 53%]
+tests/test_app_errors.py::test_request_outcome_logged PASSED             [ 56%]
+tests/test_app_security.py::test_unauthenticated_redirects_to_login_with_next PASSED [ 58%]
+tests/test_app_security.py::test_authenticated_user_can_access PASSED    [ 60%]
+tests/test_app_security.py::test_clerk_blocked_from_manager_route PASSED [ 63%]
+tests/test_app_security.py::test_manager_allowed_on_manager_route PASSED [ 65%]
+tests/test_app_security.py::test_unauthenticated_manager_route_redirects_to_login PASSED [ 68%]
+tests/test_app_validation.py::test_parse_int_ok PASSED                   [ 70%]
+tests/test_app_validation.py::test_parse_int_non_int_raises_validation PASSED [ 73%]
+tests/test_app_validation.py::test_parse_int_negative_raises_validation PASSED [ 75%]
+tests/test_app_validation.py::test_parse_int_empty_raises_validation PASSED [ 78%]
+tests/test_app_validation.py::test_parse_decimal_ok PASSED               [ 80%]
+tests/test_app_validation.py::test_parse_decimal_non_numeric_raises_validation PASSED [ 82%]
+tests/test_app_validation.py::test_parse_items_skips_empty_and_parses_quantity PASSED [ 85%]
+tests/test_app_validation.py::test_parse_items_non_int_quantity_raises PASSED [ 87%]
+tests/test_app_validation.py::test_parse_items_negative_quantity_raises PASSED [ 90%]
+tests/test_app_validation.py::test_parse_items_all_empty_raises PASSED   [ 92%]
+tests/test_app_validation.py::test_create_order_forwards_order_item_inputs PASSED [ 95%]
+tests/test_app_validation.py::test_create_order_propagates_insufficient_stock PASSED [ 97%]
+tests/test_app_validation.py::test_create_order_propagates_stopped_product PASSED [100%]
+
+============================= 41 passed in 1.65s ==============================

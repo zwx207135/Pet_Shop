@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}订单详情{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h2>订单 {{ order.order_id }}</h2>
+  <a class="btn" href="{{ url_for('orders.list') }}">返回列表</a>
+</div>
+
+<div class="card">
+  <dl class="kv">
+    <dt>会员</dt><dd>{{ order.member_name }}（{{ order.member_id or '散客' }}）</dd>
+    <dt>员工</dt><dd>{{ order.employee_name }}（{{ order.employee_id }}）</dd>
+    <dt>类型</dt><dd>{{ order.order_type }}</dd>
+    <dt>时间</dt><dd>{{ order.order_time | dt }}</dd>
+    <dt>支付方式</dt><dd>{{ order.pay_method }}</dd>
+    <dt>状态</dt><dd>{{ order.order_status }}</dd>
+    <dt>总金额</dt><dd>¥{{ order.total_amount | money }}</dd>
+  </dl>
+</div>
+
+<h3>明细</h3>
+<table class="table">
+  <thead><tr><th>明细号</th><th>商品</th><th>单价</th><th>数量</th><th>小计</th></tr></thead>
+  <tbody>
+    {% for d in order.details %}
+    <tr>
+      <td>{{ d.detail_id }}</td>
+      <td>{{ d.product_name }}（{{ d.product_id }}）</td>
+      <td>¥{{ d.unit_price | money }}</td>
+      <td>{{ d.quantity }}</td>
+      <td>¥{{ d.subtotal | money }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<form method="post" action="{{ url_for('orders.update_status', order_id=order.order_id) }}" class="inline">
+  <select name="order_status">
+    {% for s in ['已完成', '未完成'] %}
+      <option value="{{ s }}" {% if order.order_status == s %}selected{% endif %}>{{ s }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-sm">更新状态</button>
+</form>
+{% endblock %}

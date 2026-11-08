@@ -18,3 +18,6 @@ backups/*.trn
 htmlcov/
 .idea/
 .vscode/
+
+# Web 应用运行时日志（成员B）
+logs/

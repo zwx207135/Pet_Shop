@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}补货入库{% endblock %}
+{% block content %}
+<h2>补货入库</h2>
+<div class="card">
+  <p>商品：<strong>{{ inventory.product_name }}</strong>（{{ inventory.product_id }}）</p>
+  <p>当前库存：{{ inventory.quantity }} 件（{{ inventory.stock_status }}）</p>
+  <form method="post">
+    <label>入库数量
+      <input type="number" min="1" name="change_qty" value="{{ form.get('change_qty', '') }}" required>
+    </label>
+    <label>备注
+      <input type="text" name="remark" value="{{ form.get('remark') or '' }}" maxlength="100">
+    </label>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">确认入库</button>
+      <a class="btn" href="{{ url_for('inventory.list') }}">取消</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

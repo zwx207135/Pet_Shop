@@ -12,8 +12,25 @@ import sys
 
 import pyodbc
 
+_DRIVER_PREFERENCES = (
+    "ODBC Driver 18 for SQL Server",
+    "ODBC Driver 17 for SQL Server",
+    "ODBC Driver 13 for SQL Server",
+    "SQL Server",
+)
+
+
+def _pick_driver() -> str:
+    """Choose an installed SQL Server ODBC driver (18 > 17 > 13 > legacy)."""
+    installed = set(pyodbc.drivers())
+    for name in _DRIVER_PREFERENCES:
+        if name in installed:
+            return name
+    return _DRIVER_PREFERENCES[0]
+
+
 MASTER = (
-    "DRIVER={ODBC Driver 18 for SQL Server};SERVER=localhost;DATABASE=master;"
+    "DRIVER={" + _pick_driver() + "};SERVER=localhost;DATABASE=master;"
     "Trusted_Connection=yes;Encrypt=yes;TrustServerCertificate=yes;"
 )
 TABLES = (

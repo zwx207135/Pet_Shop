@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}出错了{% endblock %}
+{% block content %}
+<div class="card card-narrow error-card">
+  <h2>{{ status }}</h2>
+  {% if error %}
+    <p class="error-msg">{{ error.message }}</p>
+    <p class="muted">错误码：{{ error.code }}</p>
+  {% elif status == 404 %}
+    <p class="error-msg">页面不存在</p>
+  {% else %}
+    <p class="error-msg">系统内部错误，请稍后重试</p>
+  {% endif %}
+  <a class="btn btn-primary" href="{{ url_for('main.index') }}">返回首页</a>
+</div>
+{% endblock %}

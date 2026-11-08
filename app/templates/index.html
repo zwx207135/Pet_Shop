@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}工作台{% endblock %}
+{% block content %}
+<h2>欢迎，{{ current_user.employee_name }}（{{ current_user.role }}）</h2>
+
+<div class="grid-2">
+  <div class="card">
+    <h3>快捷入口</h3>
+    <div class="quick-links">
+      <a class="btn" href="{{ url_for('products.list') }}">商品管理</a>
+      <a class="btn" href="{{ url_for('inventory.list') }}">库存管理</a>
+      <a class="btn" href="{{ url_for('orders.create') }}">开单</a>
+      <a class="btn" href="{{ url_for('orders.list') }}">订单查询</a>
+      <a class="btn" href="{{ url_for('members.list') }}">会员管理</a>
+      {% if current_user.role == '店长' %}
+        <a class="btn" href="{{ url_for('employees.list') }}">员工管理</a>
+        <a class="btn" href="{{ url_for('reports.index') }}">经营报表</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>低库存预警</h3>
+    {% if low_stock %}
+      <ul class="list">
+        {% for s in low_stock %}
+          <li>{{ s.product_name }}（{{ s.product_id }}）剩余 {{ s.quantity }} 件 · {{ s.stock_status }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">当前没有低库存商品。</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
