@@ -1,0 +1,95 @@
+%% PetCare 宠物店管理系统 ER 图（v1.0）
+%% 逻辑源文件；图片由 docs/er/render_er.py 生成，二者实体与联系保持一致。
+%% 基数读法：靠近某实体的标记，表示“另一个实体的一个实例对应多少个该实体”。
+erDiagram
+    EMPLOYEE ||--o{ ORDERS : "经办"
+    MEMBER |o--o{ ORDERS : "下单"
+    ORDERS ||--|{ ORDERDETAIL : "包含"
+    PRODUCT ||--o{ ORDERDETAIL : "被购买"
+    PRODUCT ||--o| INVENTORY : "对应"
+    PRODUCT ||--o{ INVENTORYLOG : "产生"
+    EMPLOYEE |o--o{ SERVICEAPPOINTMENT : "负责"
+    MEMBER |o--o{ SERVICEAPPOINTMENT : "预约"
+    PETSERVICE ||--o{ SERVICEAPPOINTMENT : "被预约"
+
+    PRODUCT {
+        string product_id PK
+        string product_name
+        string category
+        decimal price
+        int stock_warn
+        string status
+    }
+
+    INVENTORY {
+        string inventory_id PK
+        string product_id FK, UK
+        int quantity
+        datetime update_time
+    }
+
+    INVENTORYLOG {
+        string log_id PK
+        string product_id FK
+        string change_type
+        int change_qty
+        datetime change_time
+        string remark
+    }
+
+    MEMBER {
+        string member_id PK
+        string member_name
+        string phone UK
+        int points
+        date join_date
+    }
+
+    EMPLOYEE {
+        string employee_id PK
+        string employee_name
+        string role
+        string phone UK
+        date hire_date
+        string login_name UK
+        string password_hash
+        bit is_active
+    }
+
+    ORDERS {
+        string order_id PK
+        string member_id FK
+        string employee_id FK
+        string order_type
+        datetime order_time
+        decimal total_amount
+        string pay_method
+        string order_status
+    }
+
+    ORDERDETAIL {
+        string detail_id PK
+        string order_id FK
+        string product_id FK
+        int quantity
+        decimal unit_price
+        decimal subtotal "PERSISTED computed"
+    }
+
+    PETSERVICE {
+        string service_id PK
+        string service_name UK
+        decimal price
+        int duration_min
+        string status
+    }
+
+    SERVICEAPPOINTMENT {
+        string appointment_id PK
+        string member_id FK
+        string service_id FK
+        string employee_id FK
+        datetime appoint_time
+        string status
+        string remark
+    }

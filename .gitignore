@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local configuration and secrets
+.env
+.env.local
+
+# SQL Server backups (baseline lives in the SQL Server backup directory)
+backups/*.bak
+backups/*.trn
+
+# Test / editor artifacts
+.coverage
+htmlcov/
+.idea/
+.vscode/

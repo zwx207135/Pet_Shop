@@ -1,0 +1,55 @@
+# Database: PetCareDB_v01
+
+## row counts
+object_name | row_count
+--- | ---
+Product | 3
+Inventory | 3
+InventoryLog | 3
+Member | 2
+Employee | 2
+Orders | 2
+OrderDetail | 2
+PetService | 3
+ServiceAppointment | 2
+
+## v_order_detail
+order_id | member_name | employee_name | product_name | quantity | unit_price | subtotal
+--- | --- | --- | --- | --- | --- | ---
+O2025010101 | 张三 | 赵店员 | 皇家猫粮2kg | 1 | 128.00 | 128.00
+O2025010102 | 散客 | 赵店员 | 狗狗磨牙棒 | 1 | 19.90 | 19.90
+
+## v_product_sales
+product_id | product_name | sold_qty | sales_amount
+--- | --- | --- | ---
+P001 | 皇家猫粮2kg | 1 | 128.00
+P002 | 狗狗磨牙棒 | 1 | 19.90
+P003 | 宠物牵引绳 | 0 | 0.00
+
+## v_inventory_status
+product_id | product_name | quantity | stock_warn | stock_status
+--- | --- | --- | --- | ---
+P001 | 皇家猫粮2kg | 20 | 5 | 正常
+P002 | 狗狗磨牙棒 | 50 | 10 | 正常
+P003 | 宠物牵引绳 | 15 | 5 | 正常
+
+## v_member_consumption
+member_id | member_name | points | order_count | total_spent
+--- | --- | --- | --- | ---
+M001 | 张三 | 100 | 1 | 128.00
+M002 | 李四 | 50 | 0 | 0.00
+
+## order total vs detail sum
+order_id | total_amount | detail_total | detail_lines
+--- | --- | --- | ---
+O2025010101 | 128.00 | 128.00 | 1
+O2025010102 | 19.90 | 19.90 | 1
+
+## Employee columns
+COLUMN_NAME | DATA_TYPE | IS_NULLABLE
+--- | --- | ---
+employee_id | char | NO
+employee_name | varchar | NO
+role | varchar | NO
+phone | varchar | YES
+hire_date | date | NO

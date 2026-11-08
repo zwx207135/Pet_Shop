@@ -1,0 +1,26 @@
+﻿已将数据库上下文更改为 "PetCareDB"。
+--- 1. 迁移结构检查 ---
+PASS: structure
+--- 2. 迁移前后数据量保持 ---
+PASS: row counts
+--- 3. 订单金额与计算列 ---
+PASS: order amounts
+--- 4. 统计视图回归 ---
+警告: 聚合或其他 SET 操作消除了 Null 值。
+警告: 聚合或其他 SET 操作消除了 Null 值。
+警告: 聚合或其他 SET 操作消除了 Null 值。
+警告: 聚合或其他 SET 操作消除了 Null 值。
+警告: 聚合或其他 SET 操作消除了 Null 值。
+警告: 聚合或其他 SET 操作消除了 Null 值。
+PASS: reporting views
+--- 5. 登录视图 ---
+PASS: login view
+--- 6. 店员权限 ---
+PASS: clerk permissions
+--- 7. 店长权限 ---
+PASS: manager permissions
+--- 8. auth 账号权限 ---
+PASS: auth permissions
+--- 9. 下单事务回滚 ---
+PASS: transaction rollback
+REGRESSION PASS

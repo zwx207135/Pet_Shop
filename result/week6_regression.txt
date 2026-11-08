@@ -1,0 +1,4 @@
+== sql\regression.sql (3 batches) ==
+[batch 1] OK
+[batch 2] OK
+[batch 3] OK
